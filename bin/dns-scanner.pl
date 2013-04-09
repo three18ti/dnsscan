@@ -34,7 +34,7 @@ while (keys $scanner->state) {
 
             $scanner->select->remove($socket);
 
-#            $scanner->logger(scalar $scanner->state->keys . " remaining") if $scanner->verbose;
+            $scanner->logger(scalar $scanner->state->keys . " remaining") if $scanner->verbose;
         }
     }
     else {
@@ -49,10 +49,9 @@ while (keys $scanner->state) {
 #                $scanner->queried++;
 
                 $scanner->state->{$socket} = undef;
+                delete $scanner->state->{$socket};
 
                 $scanner->select->remove($socket);
-
-                $scanner->state->{$socket}->delete;
                 
             }
         }

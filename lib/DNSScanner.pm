@@ -132,14 +132,14 @@ sub handle_result {
     }
     
     $self->state->{$socket} = undef;
-#    delete $self->state-{$socket};
+    delete $self->state->{$socket};
 }
 
 
 sub logger {
     my $self = shift;
     my $message = shift;
-    say STDERR "# " . scalar gmtime() . "| $message";
+    say STDERR "# " . scalar gmtime() . "> $message";
 }
 
 sub sanity_check {
