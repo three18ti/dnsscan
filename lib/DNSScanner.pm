@@ -68,6 +68,13 @@ has 'verbose' => (
     default => '0',
 );
 
+# positive responses
+has 'hits' => (
+    is      => 'rw',
+    isa     => 'ArrayRef',
+    default => sub { [] },
+);
+
 
 sub launch_queries {
     my $self = shift;
@@ -127,8 +134,9 @@ sub handle_result {
         $self->logger("No answer from $ip") if $self->verbose;
     }
     else {
-        say "[*] Got answer from $ip - Possible open resolver";
+        say "[*] Got answer from $ip - Possible open resolver" if $self->verbose;
         $packet->print if $self->verbose;
+        push @{$self->hits}, $ip;
     }
     
     $self->state->{$socket} = undef;
@@ -139,7 +147,25 @@ sub handle_result {
 sub logger {
     my $self = shift;
     my $message = shift;
-    say STDERR "# " . scalar gmtime() . "> $message";
+    my $FH = shift || *STDERR;
+    say $FH "# " . scalar gmtime() . "| $message";
+}
+
+# print a nice "formatted" report
+sub print_report_nice {
+    my $self = shift;
+    my $FH = shift || *STDOUT;
+
+    say $FH "[*] Got answer from $_ - Possible open resolver" foreach @{$self->hits};
+}
+
+# report only the ips that responded positively
+sub print_hits {
+    my $self = shift;
+    my $FH = shift || *STDOUT;
+
+    say $FH $_ foreach @{$self->hits};
+    
 }
 
 sub sanity_check {

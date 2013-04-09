@@ -23,8 +23,7 @@ $ip = $scanner->launch_queries($ip);
 $scanner->logger($scanner->select->count . "queries running...") if $scanner->verbose;
 
 my @ready;
-
-while (keys $scanner->state) {
+do {
     @ready = $scanner->select->can_read(2);
     
     if (@ready) {
@@ -34,7 +33,7 @@ while (keys $scanner->state) {
 
             $scanner->select->remove($socket);
 
-            $scanner->logger(scalar $scanner->state->keys . " remaining") if $scanner->verbose;
+#            $scanner->logger(scalar $scanner->state->keys . " remaining") if $scanner->verbose;
         }
     }
     else {
@@ -57,4 +56,7 @@ while (keys $scanner->state) {
         }
     }
     $ip = $scanner->launch_queries($ip);
-}
+}  while (keys $scanner->state);
+
+$scanner->print_report_nice;
+$scanner->print_hits;
