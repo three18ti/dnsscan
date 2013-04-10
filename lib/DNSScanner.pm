@@ -75,6 +75,49 @@ has 'hits' => (
     default => sub { [] },
 );
 
+sub launch_scan {
+    my $self = shift;
+    my $range = shift;
+
+    my $ip = Net::IP->new($range);
+
+    $self->logger("Launching queries against " . $ip->print . ", in sets of " . $self->at_once . " at a time...") 
+        if $self->verbose;
+
+    my @ready;
+    do {
+        @ready = $self->select->can_read(2);
+
+        if (@ready) {
+            foreach my $socket (@ready) {
+                $self->handle_result($socket);
+                #$self->queried = $self->queried + 1;
+
+                $self->select->remove($socket);
+
+                #$self->logger(scalar keys %{$self->state} . " remaining") if $self->verbose;
+            }
+        }
+        else {
+            my $now = time;
+            foreach my $socket ($self->select->handles) {
+                if ($now - $self->state->{$socket}->{when} > $self->timeout * 2) {
+                    my $resolver_ip = $self->state->{$socket}->{ip};
+
+                    $self->logger("Query for $resolver_ip timed out") if $self->verbose;
+
+                    #$self->queried++;
+
+                    $self->state->{$socket} = undef;
+                    delete $self->state->{$socket};
+
+                    $self->select->remove($socket);
+                }
+            }
+        }
+        $ip = $self->launch_queries($ip);
+    } while (keys $self->state);
+}
 
 sub launch_queries {
     my $self = shift;
