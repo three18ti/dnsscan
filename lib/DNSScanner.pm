@@ -75,6 +75,7 @@ has 'hits' => (
     default => sub { [] },
 );
 
+# main loop,
 sub launch_scan {
     my $self = shift;
     my $range = shift;
@@ -116,6 +117,7 @@ sub launch_scan {
             }
         }
         $ip = $self->launch_queries($ip);
+        $self->logger($self->select->count . "queries running...") if $self->verbose;
     } while (keys $self->state);
 }
 
@@ -211,7 +213,7 @@ sub print_hits {
     
 }
 
-sub sanity_check {
+sub valid_domain {
     my $self = shift;
     my $dns = Net::DNS::Resolver->new;
     my $query = $dns->search($self->search_domain, 'A');
