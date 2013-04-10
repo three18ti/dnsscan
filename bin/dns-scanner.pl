@@ -18,8 +18,6 @@ my $ip = new Net::IP($range);
 $scanner->logger("Launching queries against " . $ip->print . ", in sets of " . $scanner->at_once . " at a time...") 
     if $scanner->verbose;
 
-$ip = $scanner->launch_queries($ip);
-
 $scanner->logger($scanner->select->count . "queries running...") if $scanner->verbose;
 
 my @ready;
@@ -33,7 +31,7 @@ do {
 
             $scanner->select->remove($socket);
 
-#            $scanner->logger(scalar $scanner->state->keys . " remaining") if $scanner->verbose;
+#            $scanner->logger(scalar keys %{$scanner->state} . " remaining") if $scanner->verbose;
         }
     }
     else {
