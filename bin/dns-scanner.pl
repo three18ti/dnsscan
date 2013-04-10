@@ -6,7 +6,6 @@ use 5.010;
 
 use Getopt::Long::Descriptive;
 
-use lib 'lib';
 use DNSScanner;
 
 my ($opt, $usage) = describe_options(

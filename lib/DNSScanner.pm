@@ -230,3 +230,5 @@ sub valid_domain {
 }
 
 1;
+__END__
+# ABSTRACT: turns baubles into trinkets
