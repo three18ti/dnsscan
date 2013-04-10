@@ -9,24 +9,28 @@ use Net::IP;
 use Net::DNS;
 use IO::Select;
 
+# handle multiple open file handles
 has 'select' => (
     is      => 'ro',
     isa     => 'IO::Select',
     default => sub { IO::Select->new },
 );
 
+# holds open filehandles/sockets for dns request
 has 'state' => (
     is      => 'rw',
     isa     => 'HashRef',
     default => sub { {} },
 );
 
+# supposed to count running quries
 has 'queried' => (
     is      => 'rw',
     isa     => 'Int',
     default => '0',
 );
 
+# start time
 has 'start' => (
     is      => 'ro',
     isa     => 'Int',
@@ -121,6 +125,7 @@ sub launch_scan {
     } while (keys $self->state);
 }
 
+# launch set num of queries
 sub launch_queries {
     my $self = shift;
     my $ip = shift;
@@ -132,6 +137,7 @@ sub launch_queries {
     return $ip;
 }
 
+# perform dns query
 sub check_resolver {
     my $self = shift;
     my $resolver_ip = shift;
@@ -164,6 +170,7 @@ sub check_resolver {
     $self->select->add($socket);
 }
 
+# pickup the socket and read the result
 sub handle_result {
     my $self = shift;
     my $socket = shift;
@@ -213,12 +220,13 @@ sub print_hits {
     
 }
 
+# checks that the search domain is valid
 sub valid_domain {
     my $self = shift;
     my $dns = Net::DNS::Resolver->new;
     my $query = $dns->search($self->search_domain, 'A');
 
-    return $query ? '1' : '0';
+    return $query;
 }
 
 1;

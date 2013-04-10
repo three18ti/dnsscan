@@ -14,7 +14,7 @@ my ($opt, $usage) = describe_options(
     [ 'search-domain|s=s',  "The domain to use for testing",            { default => 'google.com', }, ],
     [ 'queries|q=i',        "How many queries to launch at once",       { default => '100', }, ],
     [ 'timeout|t=i',        "The time to wait for a DNS response",      { default => '1', }, ],
-    [ 'retry|r=i',          "How many times to retry the request",      { default => '1', }, ],
+    [ 'retries|r=i',        "How many times to retry the request",      { default => '2', }, ],
     [],
 #    [ 'nice-report',        "Print a formatted report", ],
     [ 'ips-only',           "Only print matching ips",  ],
@@ -30,11 +30,12 @@ my $scanner = DNSScanner->new(
         search_domain   => $opt->search_domain,
         queries         => $opt->queries,
         timeout         => $opt->timeout,
+        retries         => $opt->retries,
         verbose         => $opt->verbose,
     },
 );
 
-say($usage->text . "\nInvalid Search Domain" . $scanner->search_domain . "\n"), exit unless $scanner->valid_domain;
+say($usage->text . "\nInvalid Search Domain: " . $scanner->search_domain . "\n"), exit unless $scanner->valid_domain;
 
 #do the work
 foreach my $range (@ARGV) {
@@ -45,3 +46,4 @@ foreach my $range (@ARGV) {
 #reporting
 $scanner->print_report_nice unless $opt->ips_only;
 $scanner->print_hits if $opt->ips_only;
+say "Total Time: " . (time - $scanner->start) . "s";
